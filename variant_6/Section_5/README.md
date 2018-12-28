@@ -1,4 +1,4 @@
-![image](/w.png)
+![image](w.png)
 
 ### Новое и непонятное?
 Добавлены два header файла [matrix.h](../include/matrix.h) и [rand.h](../include/rand.h)
