@@ -17,7 +17,7 @@ bool test_text(string input)
         return false;
     }
 
-    int one = atoi(&input[0]);
+    int one = (int)input[0] - (int)48;
     if (one <= 0 || one > 9) //Первый элемент больше 0 и число
     {
         return false;
