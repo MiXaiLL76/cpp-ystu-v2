@@ -5,6 +5,8 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <algorithm>
+
 #include "rand.h"
 using namespace std;
 
@@ -55,6 +57,25 @@ matrix transposeMatrix(matrix mat)
         }
     }
     return tMat;
+}
+
+//desc = true сортирует по убыванию, по умолчанию.
+matrix rowSort(matrix x, bool desc = true)
+{
+    matrix sortMat = x;
+    for (int i = 0; i < sortMat.size(); i++)
+    {
+        std::sort(sortMat[i].rbegin(), sortMat[i].rend());
+        if (desc)
+        {
+            std::reverse(sortMat[i].begin(), sortMat[i].end());
+        }
+    }
+    return sortMat;
+}
+matrix columnSort(matrix x, bool desc = true)
+{
+    return transposeMatrix(rowSort(transposeMatrix(x), desc));
 }
 
 matrix multiplyMatrix(matrix x, matrix y)
