@@ -58,7 +58,40 @@ matrix transposeMatrix(matrix mat)
     }
     return tMat;
 }
+bool isEqual(m_row x, m_row y)
+{
+    if (x.size() != y.size())
+    {
+        return false;
+    }
 
+    for (int i = 0; i < x.size(); i++)
+    {
+        if (x[i] != y[i])
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool isSymmetryMatrix(matrix x)
+{
+    if (x.size() > 0 && x[x.size() - 1].size() == x.size())
+    {
+        matrix y = transposeMatrix(x);
+        for (int i = 0; i < x.size(); i++)
+        {
+            if (!isEqual(x[i], y[i]))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
+}
 //desc = true сортирует по убыванию, по умолчанию.
 matrix rowSort(matrix x, bool desc = true)
 {
