@@ -7,24 +7,24 @@
 
 using namespace std;
 
-class biblio
+class school
 {
    private:
      string db_file;
-     vector<vector<string>> books;
+     vector<vector<string>> lessons;
      int max_length = 10;
 
    public:
-     vector<vector<string>> getBooks();
-     biblio(string db_file);
-     void get_lengthM(vector<string> book);
-     void print(string autor = "*");
+     vector<vector<string>> getlessons();
+     school(string db_file);
+     void get_lengthM(vector<string> lesson);
+     void print(string kab = "*");
      string add_space(string in, int max);
-     bool addBook(string autor, string name, string izdatel, string year, string price);
+     bool addlesson(string time, string class_, string predmet, string cabinet, string prepod);
 };
-void biblio::get_lengthM(vector<string> book)
+void school::get_lengthM(vector<string> lesson)
 {
-     for (auto s : book)
+     for (auto s : lesson)
      {
           float length = 0;
 
@@ -45,39 +45,38 @@ void biblio::get_lengthM(vector<string> book)
           }
      }
 }
-
-bool biblio::addBook(string autor, string name, string izdatel, string year, string price)
+//(номер урока, время начала урока, класс, предмет, номер кабинета).
+bool school::addlesson(string time, string class_, string predmet, string cabinet, string prepod)
 {
-     vector<string> book;
-     book.push_back(autor);
-     book.push_back(name);
-     book.push_back(izdatel);
-     book.push_back(year);
-     book.push_back(price);
-     this->books.push_back(book);
-     this->get_lengthM(book);
+     vector<string> lesson;
+     lesson.push_back(time);
+     lesson.push_back(class_);
+     lesson.push_back(cabinet);
+     lesson.push_back(prepod);
+     this->lessons.push_back(lesson);
+     this->get_lengthM(lesson);
 
      ofstream out(this->db_file, ios_base::app);
      if (out.is_open())
      {
           ostringstream oss;
-          if (!book.empty())
+          if (!lesson.empty())
           {
-               std::copy(book.begin(), book.end() - 1,
+               std::copy(lesson.begin(), lesson.end() - 1,
                          std::ostream_iterator<string>(oss, ","));
-               oss << book.back();
+               oss << lesson.back();
                out << oss.str() << endl;
           }
      }
      out.close();
 }
 
-vector<vector<string>> biblio::getBooks()
+vector<vector<string>> school::getlessons()
 {
-     return this->books;
+     return this->lessons;
 }
 
-string biblio::add_space(string in, int max)
+string school::add_space(string in, int max)
 {
 
      float length = 0;
@@ -103,7 +102,7 @@ string biblio::add_space(string in, int max)
      return " " + in + " ";
 }
 
-void biblio::print(string autor)
+void school::print(string kab)
 {
      for (int i = 0; i < (this->max_length + 2) * 6; i++)
      {
@@ -111,11 +110,12 @@ void biblio::print(string autor)
      }
      cout << endl;
 
-     cout << this->add_space("Автор", this->max_length) << "|"
-          << this->add_space("Название книги", this->max_length) << "|"
-          << this->add_space("Издательство", this->max_length) << "|"
-          << this->add_space("Год", this->max_length) << "|"
-          << this->add_space("Цена", this->max_length) << endl;
+     //(номер урока, время начала урока, класс, предмет, номер кабинета).
+     cout << this->add_space("Номер урока", this->max_length) << "|"
+          << this->add_space("Время начала урока", this->max_length) << "|"
+          << this->add_space("Класс", this->max_length) << "|"
+          << this->add_space("Предмет", this->max_length) << "|"
+          << this->add_space("№ Кабинета", this->max_length) << endl;
 
      for (int i = 0; i < (this->max_length + 2) * 6; i++)
      {
@@ -124,28 +124,34 @@ void biblio::print(string autor)
      cout << endl;
 
      int printed = 0;
-     for (auto book : this->books)
+     int num = 0;
+     for (auto lesson : this->lessons)
      {
-          if (book[0].find(autor) == std::string::npos && autor != "*")
+          if (lesson[3].find(kab) == std::string::npos && kab != "*")
           {
                continue;
           }
           printed++;
-          cout << this->add_space(book[0], this->max_length) << "|"
-               << this->add_space(book[1], this->max_length) << "|"
-               << this->add_space(book[2], this->max_length) << "|"
-               << this->add_space(book[3], this->max_length) << "|"
-               << this->add_space(book[4], this->max_length) << endl;
+
+          ostringstream oss;
+          num++;
+          oss << num;
+
+          cout << this->add_space(oss.str(), this->max_length) << "|"
+               << this->add_space(lesson[0], this->max_length) << "|"
+               << this->add_space(lesson[1], this->max_length) << "|"
+               << this->add_space(lesson[2], this->max_length) << "|"
+               << this->add_space(lesson[3], this->max_length) << endl;
      }
      if (printed == 0)
      {
-          cout << "Книги не найдены.";
+          cout << "Уроки не найдены.";
      }
      cout << endl
           << endl;
 }
 
-biblio::biblio(string db_file) : db_file(db_file)
+school::school(string db_file) : db_file(db_file)
 {
      string line;
      std::ifstream in(db_file); // окрываем файл для чтения
@@ -153,20 +159,20 @@ biblio::biblio(string db_file) : db_file(db_file)
      {
           while (getline(in, line))
           {
-               vector<string> book;
+               vector<string> lesson;
                while (line.find(',') != std::string::npos)
                {
-                    book.push_back(line.substr(0, line.find(',')));
+                    lesson.push_back(line.substr(0, line.find(',')));
                     line.erase(0, line.find(',') + 1);
                }
-               if (book.size() > 0)
+               if (lesson.size() > 0)
                {
-                    for (int i = 0; i < 5 - book.size(); i++)
+                    for (int i = 0; i < 5 - lesson.size(); i++)
                     {
-                         book.push_back("");
+                         lesson.push_back("");
                     }
-                    this->books.push_back(book);
-                    this->get_lengthM(book);
+                    this->lessons.push_back(lesson);
+                    this->get_lengthM(lesson);
                }
           }
      }
@@ -174,14 +180,14 @@ biblio::biblio(string db_file) : db_file(db_file)
 
 int main()
 {
-     biblio books_lib("db.dat");
+     school lessons_lib("db.dat");
 
      stringstream info;
-     info << "Домашняя библиотека." << endl
+     info << "Рассписание учителя." << endl
           << "Чтобы выйти введите 'q'" << endl
-          << "Чтобы добавить книгу введите 'a'" << endl
-          << "Для вывода всех книг введите 'p'" << endl
-          << "Для вывода всех книг по автору введите 'f'" << endl
+          << "Чтобы добавить урок введите 'a'" << endl
+          << "Для вывода всех уроков введите 'p'" << endl
+          << "Для поиска по кабинету введите 'f'" << endl
           << ">> ";
 
      string input_line;
@@ -196,51 +202,51 @@ int main()
           }
           else if (input_line == "a")
           {
-               string autor, name, izdatel, year, price;
-               cout << "Введите название книги:";
-               getline(cin, name);
+               string time, class_, predmet, cabinet, prepod;
+               cout << "Введите время урока:";
+               getline(cin, time);
 
-               cout << "Введите автора книги:";
-               getline(cin, autor);
+               cout << "Введите класс:";
+               getline(cin, class_);
 
-               cout << "Введите издательство книги:";
-               getline(cin, izdatel);
+               cout << "Введите предмет:";
+               getline(cin, predmet);
 
-               cout << "Введите год написания книги:";
-               getline(cin, year);
+               cout << "Введите кабинеты:";
+               getline(cin, cabinet);
 
-               cout << "Введите цену книги:";
-               getline(cin, price);
-               books_lib.addBook(autor, name, izdatel, year, price);
+               cout << "Введите имя учителя:";
+               getline(cin, prepod);
+               lessons_lib.addlesson(time, class_, predmet, cabinet, prepod);
           }
           else if (input_line == "p")
           {
-               if (books_lib.getBooks().size() == 0)
+               if (lessons_lib.getlessons().size() == 0)
                {
                     cout << endl
-                         << ">       Библиотека пуста." << endl;
+                         << ">       Рассписание пусто." << endl;
                }
                else
                {
-                    books_lib.print();
+                    lessons_lib.print();
                }
                cin;
           }
           else if (input_line == "f")
           {
-               string autor;
+               string kab;
 
-               cout << "Введите автора книги:";
-               getline(cin, autor);
+               cout << "Введите кабинет:";
+               getline(cin, kab);
 
-               if (books_lib.getBooks().size() == 0)
+               if (lessons_lib.getlessons().size() == 0)
                {
                     cout << endl
-                         << ">       Библиотека пуста." << endl;
+                         << ">       Рассписание пусто." << endl;
                }
                else
                {
-                    books_lib.print(autor);
+                    lessons_lib.print(kab);
                }
                cin;
           }
@@ -248,3 +254,31 @@ int main()
 
      return 0;
 }
+
+/*
+Рассписание учителя.
+Чтобы выйти введите 'q'
+Чтобы добавить урок введите 'a'
+Для вывода всех уроков введите 'p'
+Для поиска по кабинету введите 'f'
+>> p
+________________________________________________________________________
+ Номер урока | Время начала урока | Класс      | Предмет    | № Кабинета
+------------------------------------------------------------------------
+ 1          | 2          | 2b         | 402        | Михаил
+
+*/
+
+/*
+Рассписание учителя.
+Чтобы выйти введите 'q'
+Чтобы добавить урок введите 'a'
+Для вывода всех уроков введите 'p'
+Для поиска по кабинету введите 'f'
+>> a
+Введите время урока:2
+Введите класс:2b
+Введите предмет:Математика
+Введите кабинеты:402
+Введите имя учителя:Михаил
+*/

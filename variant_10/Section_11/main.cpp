@@ -3,56 +3,51 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#include <vector>
 
 using namespace std;
 
+double GeoMean(std::vector<double> x)
+{
+     double res = 1.;
+     for (double var : x)
+     {
+          res *= var;
+     }
+     return pow(res, 1.0 / x.size());
+}
+
 int main()
 {
-     std::string line,
-         line_nums,
-         file = "input.txt",
-         nums = "0123456789";
+     std::vector<double> list;
 
-     cout << "Читаем строку из файла: " << file << endl;
+     std::string line,
+         file = "input.txt";
+
+     cout << "Читаем строки из файла: " << file << endl;
      std::ifstream in(file); // окрываем файл для чтения
      if (in.is_open())
      {
           while (getline(in, line))
           {
-               for (int i = 1; i < line.length(); i++)
+               double var = atof(line.c_str());
+               if (var > 0)
                {
-                    for (int w = 1; w < nums.length(); w++)
-                    {
-                         if (line[i] == nums[w])
-                         {
-                              line_nums += line[i];
-                              line_nums += ";";
-                         }
-                    }
+                    list.push_back(var);
+                    cout << "   >   " << var << endl;
                }
           }
      }
      in.close(); // закрываем файл
-     cout << "Исходная строка: " << line_nums << endl;
-
-     std::stringstream line_out;
-     double y[line_nums.length()];
-     for (int i = 0; i < line_nums.length(); i++)
-     {
-          int x = (int)line_nums[i] - (int)48;
-          y[i] = (pow(x, 2) + 1) / (pow(x, 3) + 2);
-          line_out << y[i] << ";";
-     }
-     cout << "Итоговая строка: " << line_out.str() << endl;
-
-     std::ofstream out;
-     out.open("out_" + file);
-     if (out.is_open())
-     {
-          out << line_out.str();
-     }
-     out.close();
-     cout << "Файл "
-          << "out_" + file << " сформирован." << endl;
+     cout << "Среднее геометрическое: " << GeoMean(list) << endl;
      return 0;
 }
+
+/*
+Читаем строки из файла: input.txt
+   >   0.5
+   >   5.8
+   >   5.882
+   >   0.99
+Среднее геометрическое: 2.02717
+*/

@@ -10,7 +10,7 @@ string sDet(int a, int b, int c)
 {
      double p = (a + b + c) / 2;
      double s = sqrt(p * (p - a) * (p - b) * (p - c));
-     ostringstream oss;
+     std::ostringstream oss;
      oss << s;
      return "существует! Площадь: " + oss.str();
 }
